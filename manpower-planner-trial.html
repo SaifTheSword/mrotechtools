@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Manpower Planner (Trial Version)</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a111d;--p:#111b2b;--p2:#17233a;--ink:#e8eef8;--mute:#8393ad;--line:#243452;--eng:#f28c28;--tech:#f5c518;--clean:#5aa9ff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:inherit}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 13px/1.3 Barlow,system-ui,sans-serif;min-height:100%}
+.trial{background:var(--ink);color:var(--bg);text-align:center;font:500 13px Barlow;padding:6px 10px}.trial b{font:700 14px "Barlow Condensed";letter-spacing:.1em}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px 18px;background:var(--p);border-bottom:2px solid var(--ink)}
+.t{font:700 22px/1 "Barlow Condensed";letter-spacing:.05em}
+.bar{display:flex;gap:6px;flex-wrap:wrap}
+a.back{font:inherit;font-weight:600;border:1px solid var(--line);border-radius:5px;padding:5px 10px;background:transparent;color:var(--ink);text-decoration:none;display:inline-block}a.back:hover{background:var(--p2)}
+button{font:inherit;font-weight:600;border:1px solid var(--line);border-radius:5px;padding:5px 10px;background:transparent;color:var(--ink);cursor:pointer}
+:focus-visible{outline:2px solid var(--clean);outline-offset:1px}
+main{display:grid;grid-template-columns:280px 1fr;gap:12px;padding:12px 18px;align-items:start}
+@media(max-width:760px){main{grid-template-columns:1fr;padding:10px}}
+section{background:var(--p);border:1px solid var(--line);border-radius:8px;padding:12px}
+h2{font:600 17px/1 "Barlow Condensed";letter-spacing:.05em;margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+h2 span{font:400 12px Barlow;color:var(--mute);letter-spacing:0}
+.chips{display:flex;flex-wrap:wrap;gap:4px;min-height:30px;align-content:flex-start;border-radius:5px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border-radius:4px;color:#0a111d;font-weight:600;font-size:12.5px;user-select:none;cursor:grab;border:2px solid transparent;border-left:4px solid rgba(0,0,0,.3);line-height:1.25}
+.chip.engineer{background:var(--eng)}.chip.technician{background:var(--tech)}.chip.cleaner{background:var(--clean)}
+.chip.sel{border-color:#fff}
+.chip button{all:unset;cursor:pointer;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.3);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1}
+.empty{color:var(--mute);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:6px}
+.card{display:flex;gap:10px;align-items:flex-start;background:var(--p2);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.hd{width:92px;flex:none}.reg{font:700 18px/1 "Barlow Condensed";letter-spacing:.05em}.ty{font-size:10.5px;font-style:italic;color:var(--mute)}
+.drop{flex:1;min-height:30px;display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;border-radius:5px;padding:2px}
+.over{background:rgba(90,169,255,.16)}
+.pick .drop{outline:1px dashed var(--clean)}
+.toast{position:fixed;left:50%;top:56px;transform:translateX(-50%);z-index:20;background:var(--ink);color:var(--bg);font:600 14px Barlow;padding:10px 18px;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.5);max-width:92vw;text-align:center}
+.toast[hidden]{display:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;padding:8px 18px;background:var(--p2);border-bottom:1px solid var(--line);font-size:13px}.legend b{font:600 13px "Barlow Condensed";letter-spacing:.08em;color:var(--mute)}.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.modal{position:fixed;inset:0;z-index:10;background:rgba(5,9,16,.75);display:flex;align-items:center;justify-content:center;padding:14px}.modal[hidden]{display:none}
+.mbox{background:var(--p);border:1px solid var(--line);border-radius:10px;width:min(860px,100%);max-height:90vh;display:flex;flex-direction:column;padding:14px}
+.mh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}.mh h2{margin:0;flex-direction:column;gap:4px}
+.mtools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.mscroll{overflow:auto;border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;min-width:620px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}th{font:600 12px "Barlow Condensed";letter-spacing:.06em;color:var(--mute);background:var(--p2)}td button{padding:2px 8px;font-size:12px;margin-right:4px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.end{max-width:520px;margin:15vh auto;padding:24px;text-align:center;color:#e8eef8;font-family:system-ui,sans-serif}.end h1{font-size:34px;letter-spacing:.06em;margin:0 0 12px}.end p{color:#8393ad;font-size:15px}
+</style></head>
+<body>
+<div class="top">
+ <span class="t">MANPOWER PLANNER · TRIAL VERSION</span>
+ <div class="bar"><a class="back" href="index.html">&larr; Back to main page</a><button data-l>Add project</button><button id="mt">Manage team</button><button data-l>On leave</button><button data-l>Colour scheme</button><button data-l>Export</button></div>
+</div>
+<div class="legend"><b>Colour key</b><span><i style="background:var(--eng)"></i>Orange = Engineer</span><span><i style="background:var(--tech)"></i>Yellow = Technician</span><span><i style="background:var(--clean)"></i>Blue = Cleaner</span></div>
+<main>
+ <section><h2>TEAM <span>Unassigned</span></h2><div class="chips" id="pool"></div></section>
+ <section><h2>PROJECTS <span>Drag a name onto an aircraft, or tap a name then an aircraft</span></h2><div class="grid" id="ac"></div></section>
+</main>
+<div class="modal" id="modal" hidden><div class="mbox" role="dialog" aria-modal="true" aria-label="Manage team"><div class="mh"><h2>MANAGE TEAM <span>Preview of the full version. All actions are disabled in the trial.</span></h2><button id="mx" aria-label="Close">Close</button></div><div class="mtools"><button data-l>+ Add person</button><button data-l>Import list</button><button data-l>Set on leave</button><button data-l>Set all passwords</button></div><div class="mscroll"><table><thead><tr><th>Name</th><th>Role</th><th>Licence / type rating</th><th>Login</th><th>Actions</th></tr></thead><tbody id="mrows"></tbody></table></div></div></div>
+<div class="toast" id="toast" role="alert" hidden>Trial version: this feature is available in the full version only.</div>
+<script>
+(function(){
+var KEY='mp3.d2',TK='mp3.m',DAY=864e5,DAYS=3;
+function wipe(){try{localStorage.removeItem(KEY)}catch(e){}try{sessionStorage.clear()}catch(e){}}
+function destroy(){
+ wipe();
+ try{localStorage.setItem(TK,JSON.stringify({over:1}))}catch(e){}
+ document.head.innerHTML='<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Trial ended</title>';
+ document.body.removeAttribute('class');document.body.style.cssText='background:#0a111d;margin:0';
+ document.body.innerHTML='<div class="end" style="max-width:520px;margin:15vh auto;padding:24px;text-align:center;color:#e8eef8;font-family:system-ui,sans-serif"><h1 style="font-size:34px;letter-spacing:.06em;margin:0 0 12px">TRIAL ENDED</h1><p style="color:#8393ad;font-size:15px">The 3-day trial has finished. The application and all data entered during the trial have been permanently removed.</p><p style="color:#8393ad;font-size:15px">To continue using the Manpower Planner, please contact your supplier to buy the full version.</p><p><a href="index.html" style="color:#e8eef8;font-size:15px">&larr; Back to main page</a></p></div>';
+ window.__mp=null}
+function state(){var t=null,n=Date.now();try{t=JSON.parse(localStorage.getItem(TK))}catch(e){}
+ if(!t)t={start:n,seen:n};
+ if(t.over||n<t.seen-3e5||n-t.start>=DAYS*DAY){return{over:1}}
+ t.seen=Math.max(t.seen,n);try{localStorage.setItem(TK,JSON.stringify(t))}catch(e){}return t}
+var T0=state();
+if(T0.over){destroy();return}
+
+var RO={engineer:0,technician:1,cleaner:2},S,sel=null,tt;
+var $=function(i){return document.getElementById(i)},uid=function(){return Math.random().toString(36).slice(2,9)};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+function lock(){var t=$('toast');t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true},3500)}
+function seed(){
+ var P=[['Omar Mansoori','engineer'],['Sara Lawson','engineer'],['James Doyle','engineer'],['Khalid Rashid','engineer'],['Ravi Menon','technician'],['Ali Zaabi','technician'],['Faisal Qureshi','technician'],['Arjun Pillai','technician'],['Hamza Sheikh','technician'],['Kevin Dsouza','technician'],['Noor Siddiqui','cleaner'],['Maria Santos','cleaner'],['Dinesh Kumar','cleaner']].map(function(x){return{id:uid(),name:x[0],role:x[1]}});
+ var A=[['A6-ALM','Global 7500',[0,4,10]],['A6-FLX','Challenger 350',[1,5]],['A6-SKY','Falcon 7X',[2]],['VP-BDX','G650',[]],['N512GX','Legacy 650',[]],['T7-KHZ','Phenom 300',[]]];
+ return{people:P,aircraft:A.map(function(a){return{id:uid(),reg:a[0],type:a[1],crew:a[2].map(function(i){return P[i].id})}})}}
+function load(){try{var r=localStorage.getItem(KEY);S=r?JSON.parse(r):seed()}catch(e){S=seed()}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function per(id){return S.people.filter(function(p){return p.id===id})[0]}
+function srt(a){return a.slice().sort(function(x,y){return RO[x.role]-RO[y.role]||x.name.localeCompare(y.name)})}
+function unassign(id){S.aircraft.forEach(function(a){a.crew=a.crew.filter(function(x){return x!==id})})}
+function assign(pid,aid){if(!per(pid))return;unassign(pid);S.aircraft.forEach(function(a){if(a.id===aid)a.crew.push(pid)});sel=null;save();render()}
+function chip(p,btn){
+ var d=document.createElement('span');d.className='chip '+p.role+(sel===p.id?' sel':'');d.textContent=p.name;d.draggable=true;d.tabIndex=0;
+ d.ondragstart=function(e){e.dataTransfer.setData('text/plain',p.id)};
+ d.onclick=function(){sel=sel===p.id?null:p.id;render()};
+ d.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();d.click()}};
+ if(btn){var b=document.createElement('button');b.textContent='×';b.title='Unassign';b.setAttribute('aria-label','Unassign '+p.name);b.onclick=function(e){e.stopPropagation();unassign(p.id);save();render()};d.appendChild(b)}
+ return d}
+function dz(el,fn){el.ondragover=function(e){e.preventDefault();el.classList.add('over')};el.ondragleave=function(){el.classList.remove('over')};el.ondrop=function(e){e.preventDefault();el.classList.remove('over');fn(e.dataTransfer.getData('text/plain'))}}
+function own(e,el){return e.target===el||e.target.classList.contains('empty')}
+function render(){
+ document.body.classList.toggle('pick',!!sel);
+ var loc={};S.aircraft.forEach(function(a){a.crew.forEach(function(id){loc[id]=1})});
+ var free=srt(S.people.filter(function(p){return!loc[p.id]})),pool=$('pool');
+ pool.innerHTML='';free.forEach(function(p){pool.appendChild(chip(p))});if(!free.length)pool.innerHTML='<span class="empty">Everyone is assigned.</span>';
+ dz(pool,function(id){if(per(id)){unassign(id);save();render()}});
+ pool.onclick=function(e){if(sel&&own(e,pool)){unassign(sel);sel=null;save();render()}};
+ var g=$('ac');g.innerHTML='';
+ S.aircraft.forEach(function(a){
+  var c=document.createElement('div');c.className='card';
+  c.innerHTML='<div class="hd"><div class="reg">'+esc(a.reg)+'</div><div class="ty">'+esc(a.type)+'</div></div><div class="drop"></div>';
+  var dr=c.querySelector('.drop');srt(a.crew.map(per).filter(Boolean)).forEach(function(p){dr.appendChild(chip(p,1))});
+  if(!a.crew.length)dr.innerHTML='<span class="empty">Drop crew here</span>';
+  dz(dr,function(id){assign(id,a.id)});dr.onclick=function(e){if(sel&&own(e,dr))assign(sel,a.id)};
+  g.appendChild(c)})}
+function tick(){
+ var T=state();if(T.over){destroy();clearInterval(iv);return}
+ }
+function openTeam(){var R={engineer:'Engineer',technician:'Technician',cleaner:'Cleaner'},C={engineer:'var(--eng)',technician:'var(--tech)',cleaner:'var(--clean)'},h='';srt(S.people).forEach(function(p,i){h+='<tr><td>'+esc(p.name)+'</td><td><span class="dot" style="background:'+C[p.role]+'"></span>'+R[p.role]+'</td><td>'+(p.role==='engineer'?'B1 / B2':'-')+'</td><td>'+esc(p.name.split(' ')[0].toLowerCase())+'</td><td><button data-l>Edit</button><button data-l>Leave</button><button data-l>Reset password</button><button data-l>Remove</button></td></tr>'});$('mrows').innerHTML=h;wire();$('modal').hidden=false;$('mx').focus()}
+function wire(){document.querySelectorAll('[data-l]').forEach(function(b){b.onclick=lock})}
+wire();$('mt').onclick=openTeam;$('mx').onclick=function(){$('modal').hidden=true};
+$('modal').onclick=function(e){if(e.target===$('modal'))$('modal').hidden=true};
+document.addEventListener('keydown',function(e){if(e.key==='Escape')$('modal').hidden=true});
+load();save();render();tick();var iv=setInterval(tick,30000);
+})();
+</script></body></html>
